@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
@@ -46,6 +47,31 @@ app.delete("/api/persons/:id", (req, res) => {
   let id = req.params.id;
   data = data.filter((p) => p.id !== id);
   res.status(204).end();
+});
+
+let generateId = () => Math.floor(Math.random() * 1000);
+
+app.post("/api/persons", (req, res) => {
+  let body = req.body;
+  let newPerson = {};
+  if (body.name && body.number) {
+    newPerson.id = generateId();
+    newPerson.name = body.name;
+    newPerson.number = body.number;
+  } else {
+    return res.status(400).json({
+      error: "name and/or number missing",
+    });
+  }
+  let exist = data.find((p) => p.name === newPerson.name);
+  if (!exist) {
+    data.concat(newPerson);
+    res.json(newPerson);
+  } else {
+    return res.status(400).json({
+      error: "name must be unique",
+    });
+  }
 });
 
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));
