@@ -1,5 +1,27 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
+// morgan("tiny");
+
+// define new function and add it to the morgan token to use it later in the options for morgan
+morgan.token("body", (req, res) => {
+  return JSON.stringify(req.body);
+});
+app.use(
+  morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      //   custom show the req.body from the above defined function
+      tokens.body(req, res),
+      tokens.res(req, res, "content-length"),
+      "-",
+      tokens["response-time"](req, res),
+      "ms",
+    ].join(" ");
+  })
+);
 app.use(express.json());
 
 // custom middleware
@@ -11,7 +33,7 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
-app.use(requestLogger);
+// app.use(requestLogger);
 
 const PORT = process.env.PORT || 3001;
 
