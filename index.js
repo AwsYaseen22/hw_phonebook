@@ -3,7 +3,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3001;
 
-const data = [
+let data = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -41,6 +41,11 @@ app.get("/api/persons/:id", (req, res) => {
   } else {
     res.status(404).end();
   }
+});
+app.delete("/api/persons/:id", (req, res) => {
+  let id = req.params.id;
+  data = data.filter((p) => p.id !== id);
+  res.status(204).end();
 });
 
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));
